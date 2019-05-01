@@ -1,0 +1,13 @@
+---
+name: biofilms-sim
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - anaconda=2019.03=py37_0
+  - black=19.3b0=py_0
+  - certifi=2019.3.9=py37_0
+  - flake8=3.7.7=py37_0
+  - pip=19.0.3=py37_0
+  - pre_commit=1.15.2=py37_0
+  - pydocstyle=3.0.0=py37_0
