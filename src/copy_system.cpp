@@ -4,6 +4,15 @@
 #include <utilities.hpp>
 
 namespace transformers {
+/// Refresh values of padded (ghost) cells that wrap around grid.
+///
+/// Padded (ghost) cells are used to implement boundary conditions
+/// and keep track of component states from the previous time step.
+///
+/// @param [in,out] entities Entities struct with components defining the
+///   nutrients and bacteria grids.
+/// @param [in] cells_per_row The number of columns there are per row in the
+///   padded grid.
 void refresh_padded_states(Entities &entities, int cells_per_row) {
   int num_entities = entities.names_.size();
 
@@ -20,6 +29,13 @@ void refresh_padded_states(Entities &entities, int cells_per_row) {
   }
 }
 
+/// Copy from bacteria component into bacteria_copy component.
+///
+/// Copying is used to keep track of bacteria component state from previous time
+/// step.
+///
+/// @param [in,out] entities Entities struct with components defining the
+///   nutrients and bacteria grids.
 void copy_bacteria_states(Entities &entities) {
   int num_entities = entities.names_.size();
   uint32_t transform_flag = Entities::kFlagBacteria | Entities::kFlagBacteriaCopy;
@@ -32,6 +48,13 @@ void copy_bacteria_states(Entities &entities) {
   }
 }
 
+/// Copy from nutrients component into nutrients_copy component.
+///
+/// Copying is used to keep track of nutients component state from previous time
+/// step.
+///
+/// @param [in,out] entities Entities struct with components defining the
+///   nutrients and bacteria grids.
 void copy_nutrients_states(Entities &entities) {
   int num_entities = entities.names_.size();
   uint32_t transform_flag = Entities::kFlagNutrients | Entities::kFlagNutrientsCopy;

@@ -37,15 +37,6 @@ struct IndexConverter {
   data::Index operator()(int id);
 };
 
-struct UnpaddedToPaddedIDConverter {
-  const int ksize_padding_;
-  IndexConverter unpadded_index_converter_;
-  IndexConverter padded_index_converter_;
-
-  UnpaddedToPaddedIDConverter(int unpadded_cells_per_row, int size_padding);
-  int operator()(int unpadded_cell_id);
-};
-
 bool check_if_empty(std::string filename);
 
 void save_benchmark_to_csv(

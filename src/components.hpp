@@ -6,6 +6,7 @@
 
 #include <data.hpp>
 
+/// Aliases for the different components of the simulation.
 namespace component {
 using Names = std::vector<std::string>;
 using Bacteria = std::vector<int>;
