@@ -3,6 +3,14 @@
 #include <random>
 
 namespace initializers {
+/// Initialize all entities to be used during simulation.
+///
+/// @param [in] parameters Input parameters used to initialize all entities in
+///   simulation.
+/// @param [in] indexer Function object for converting entity ids to (row,
+///   column) indices, and vice-versa.
+/// @param [in,out] random_engine Mersenne Twister engine for random number
+/// @return Entities struct with initialized components.
 Entities initialize_entities(
     const data::InitializationParameters &parameters, utilities::IndexConverter &indexer,
     std::mt19937 &random_engine) {
@@ -33,16 +41,29 @@ Entities initialize_entities(
   return entities;
 }
 
+/// EntityInitializer constructor
+///
+/// @param [in] random_engine Mersenne Twister engine for random number.
+/// @param [in] probability  Probability to create a bacterium in first column
+///   in the regular, unpadded grid.
+/// @param [in] max_nutrient Initial fill value for nutrients component.
+/// @param [in] entities Entities struct with uninitialized components.
 EntityInitializer::EntityInitializer(
     std::mt19937 &random_engine, double probability, double max_nutrient,
     Entities &entities)
     : entities_(entities), max_nutrient_(max_nutrient),
       kbacterium_initializer_(BacteriumRandomInitializer(random_engine, probability)){};
 
+/// Create a new entity and initialize its components.
+///
+/// @param [in] parameters Data container of row and column indices and location
+///   for new entity.
+/// @return Unique ID of newly created entity.
 Entities::EntityID EntityInitializer::
 operator()(data::EntityInitializationParameters parameters) {
   int id = -1;
 
+  // Initialize entity in left padding region.
   switch (parameters.cell_location) {
     case utilities::kCellLocationLeftPad:
       id = entities_.add_entity("LeftPad");
@@ -56,6 +77,7 @@ operator()(data::EntityInitializationParameters parameters) {
       entities_.flags_[id] |= Entities::kFlagCellLocations;
       break;
 
+    // Initialize entity in right padding region.
     case utilities::kCellLocationRightPad:
       id = entities_.add_entity("RightPad");
       entities_.bacteria_copy_[id] = Entities::kStateBorder;
@@ -69,6 +91,7 @@ operator()(data::EntityInitializationParameters parameters) {
       entities_.flags_[id] |= Entities::kFlagCellLocations;
       break;
 
+    // Initialize entity in top padding region.
     case utilities::kCellLocationTopPad:
       id = entities_.add_entity("TopPad");
       entities_.indices_[id].row = parameters.index.row;
@@ -80,6 +103,7 @@ operator()(data::EntityInitializationParameters parameters) {
       entities_.flags_[id] |= Entities::kFlagCellLocations;
       break;
 
+    // Initialize entity in bottom padding region.
     case utilities::kCellLocationBottomPad:
       id = entities_.add_entity("BottomPad");
       entities_.indices_[id].row = parameters.index.row;
@@ -91,6 +115,7 @@ operator()(data::EntityInitializationParameters parameters) {
       entities_.flags_[id] |= Entities::kFlagCellLocations;
       break;
 
+    // Initialize entity in first column of regular, unpadded grid.
     case utilities::kCellLocationFirstColumn:
       id = entities_.add_entity("Cell");
       entities_.bacteria_[id] = kbacterium_initializer_();
@@ -106,6 +131,7 @@ operator()(data::EntityInitializationParameters parameters) {
       entities_.flags_[id] |= Entities::kFlagCellLocations;
       break;
 
+    // Initialize entity in last column of regular, unpadded grid.
     case utilities::kCellLocationLastColumn:
       id = entities_.add_entity("Cell");
       entities_.nutrients_[id] = max_nutrient_;
@@ -120,6 +146,7 @@ operator()(data::EntityInitializationParameters parameters) {
       entities_.flags_[id] |= Entities::kFlagCellLocations;
       break;
 
+    // Initialize entity in regular, unpadded grid.
     case utilities::kCellLocationOther:
       id = entities_.add_entity("cell");
       entities_.nutrients_[id] = max_nutrient_;
@@ -138,11 +165,23 @@ operator()(data::EntityInitializationParameters parameters) {
   return id;
 }
 
+/// BacteriumRandomInitializer constructor
+///
+/// @param [in] random_engine Mersenne Twister engine for random number.
+/// @param [in] probability  Probability to create a bacterium in first column
+/// in the regular, unpadded grid.
 BacteriumRandomInitializer::BacteriumRandomInitializer(
     std::mt19937 &random_engine, double probability)
     : random_engine_(random_engine), uniform_rng_(UniformRNG(0.0, 1.0)),
       probability_(probability){};
 
+/// Initialize bacterium cell in first column of unpadded grid.
+///
+/// A random number is generated and checked against a probability. If the
+/// random number is smaller than the probability, then a bacterium is created
+/// in the cell.
+///
+/// @return Randomly selected bacterium state
 int BacteriumRandomInitializer::operator()() {
   double random_number = uniform_rng_(random_engine_);
 

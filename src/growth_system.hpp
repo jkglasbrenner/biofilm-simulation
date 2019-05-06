@@ -8,7 +8,7 @@
 
 namespace transformers {
 void apply_growth_transformation(
-    Entities &entities, double probability_bacterium,
+    Entities &entities, double probability_division,
     const data::GetNeighborsParameters &get_neighbors_parameters,
     std::mt19937 &random_engine);
 }
